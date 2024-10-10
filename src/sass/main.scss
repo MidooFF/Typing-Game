@@ -17,7 +17,7 @@ h1, h2 {
 .container {
     display: flex;
     justify-content: space-around;
-    margin-top: 60px;
+    margin-top: 200px;
     padding: 0 40px;
     align-items: center;
     .level {
@@ -40,6 +40,21 @@ h1, h2 {
             margin-left: 20px;
             cursor: pointer;
         }
+    }
+    .main-game {
+        button {
+            background-color: #289f28;;
+            color: white;
+            padding: 20px;
+            font-size: 25px;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            -webkit-border-radius: 20px;
+            -moz-border-radius: 20px;
+            -ms-border-radius: 20px;
+            -o-border-radius: 20px;
+}
     }
 }
 
