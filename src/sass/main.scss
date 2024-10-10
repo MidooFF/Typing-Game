@@ -54,7 +54,22 @@ h1, h2 {
             -moz-border-radius: 20px;
             -ms-border-radius: 20px;
             -o-border-radius: 20px;
-}
+            cursor: pointer;
+        }
+    }
+    .high-score {
+        background-color: white;
+        padding: 0px 20px;
+        border: 6px solid #dd6161;
+        border-radius: 40px;
+        -webkit-border-radius: 40px;
+        -moz-border-radius: 40px;
+        -ms-border-radius: 40px;
+        -o-border-radius: 40px;
+        padding: 20px;
+        h1 {
+            margin-bottom: 20px;
+        }
     }
 }
 
