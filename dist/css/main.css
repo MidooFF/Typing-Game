@@ -8,7 +8,7 @@ body {
   font-weight: 400;
   font-style: normal; }
 
-h1, h2 {
+h1, h2, h3 {
   margin: 0; }
 
 .container {
@@ -36,6 +36,41 @@ h1, h2 {
       color: green;
       margin-left: 20px;
       cursor: pointer; }
+    .container .level .change-level-sec.active {
+      top: 30%;
+      transform: translate(-50%, -50%);
+      transition: 300ms; }
+    .container .level .change-level-sec {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      width: 400px;
+      top: -10%;
+      left: 50%;
+      background-color: #0b0ba6;
+      transform: translate(-50%, -100%);
+      box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+      transition: 300ms; }
+      .container .level .change-level-sec h3 {
+        background-color: #3c3c79;
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #0000006b;
+        cursor: pointer; }
+      .container .level .change-level-sec h2 {
+        transition: 300ms;
+        background-color: #0b0ba6;
+        cursor: pointer;
+        padding: 20px 0;
+        border-bottom: 1px solid #0000006b;
+        color: white;
+        -webkit-transition: 300ms;
+        -moz-transition: 300ms;
+        -ms-transition: 300ms;
+        -o-transition: 300ms; }
+        .container .level .change-level-sec h2:hover {
+          background-color: #3c3c79; }
   .container .main-game button {
     background-color: #289f28;
     color: white;

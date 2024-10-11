@@ -61,5 +61,26 @@ class GetLevel {
 
 let easy = new GetLevel("Easy", [3, 4], 8);
 let medium = new GetLevel("Medium", [4, 5], 6);
-let hard = new GetLevel("Hard", [6], 4)
+let hard = new GetLevel("Hard", [6], 4);
+let insane = new GetLevel("لفل الوحش", [6], 2);
 
+let levels = [easy, medium, hard, insane];
+let currentLevel = easy;
+
+
+const changeLvlBtn = document.getElementById("change-level") as HTMLButtonElement;
+const closeLvlBtn = document.querySelector(".close-level-sec") as HTMLButtonElement;
+const changeLvlSec = document.querySelector(".change-level-sec") as HTMLDivElement;
+
+for (let i = 0; i < levels.length; i++) {
+    let levelToAdd = document.createElement("h2");
+    levelToAdd.textContent = levels[i].name;
+    changeLvlSec.appendChild(levelToAdd);
+}
+
+changeLvlBtn.addEventListener("click", function() {
+    changeLvlSec.classList.toggle("active");
+})
+closeLvlBtn.addEventListener("click", function() {
+    changeLvlSec.classList.toggle("active");
+})
