@@ -83,6 +83,7 @@ h1, h2, h3 {
     }
     .main-game {
         button {
+            display: none;
             background-color: #289f28;;
             color: white;
             padding: 20px;
@@ -95,6 +96,9 @@ h1, h2, h3 {
             -ms-border-radius: 20px;
             -o-border-radius: 20px;
             cursor: pointer;
+            &.active {
+                display: block;
+            }
         }
     }
     .high-score {

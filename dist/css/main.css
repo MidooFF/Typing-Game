@@ -72,6 +72,7 @@ h1, h2, h3 {
         .container .level .change-level-sec h2:hover {
           background-color: #3c3c79; }
   .container .main-game button {
+    display: none;
     background-color: #289f28;
     color: white;
     padding: 20px;
@@ -84,6 +85,8 @@ h1, h2, h3 {
     -ms-border-radius: 20px;
     -o-border-radius: 20px;
     cursor: pointer; }
+    .container .main-game button.active {
+      display: block; }
   .container .high-score {
     background-color: white;
     padding: 0px 20px;

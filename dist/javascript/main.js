@@ -20,16 +20,19 @@ function getWords(letters) {
     });
 }
 class GetLevel {
-    constructor(name, letters, time) {
+    constructor(name, letters, time, lives) {
         this.wordsArrs = [];
         this.randomWordsArr = 0;
         this.randomWordsInArr = 0;
         this.wordsArr = [];
+        this.dataCheck = false;
         this.name = name;
         this.letters = letters;
         this.time = time;
+        this.lives = lives;
     }
     getLevelWordsArrs(wordsCount) {
+        this.dataCheck = false;
         this.wordsArr = [];
         for (let i = 0; i < this.letters.length; i++) {
             let test = false;
@@ -43,6 +46,7 @@ class GetLevel {
                         this.wordsArr.push(this.wordsArrs[this.randomWordsArr][this.randomWordsInArr]);
                     }
                 }
+                this.dataCheck = true;
             })
                 .catch((err) => {
                 console.log(`Error: ${err}`);
@@ -50,10 +54,10 @@ class GetLevel {
         }
     }
 }
-let easy = new GetLevel("Easy", [3, 4], 8);
-let medium = new GetLevel("Medium", [4, 5], 6);
-let hard = new GetLevel("Hard", [6], 4);
-let insane = new GetLevel("لفل الوحش", [6], 2);
+let easy = new GetLevel("Easy", [3, 4], 8, 5);
+let medium = new GetLevel("Medium", [4, 5], 6, 3);
+let hard = new GetLevel("Hard", [6], 4, 1);
+let insane = new GetLevel("لفل الوحش", [6], 2, 0);
 let levels = [easy, medium, hard, insane];
 if (localStorage.getItem("lvlIndex") == null) {
     localStorage.setItem("lvlIndex", "0");
@@ -84,3 +88,86 @@ for (let i = 1; i < changeLvlSec.children.length; i++) {
     });
 }
 lvlName.textContent = levels[Number(localStorage.getItem("lvlIndex"))].name;
+const startGameBtn = document.querySelector(".start-game");
+const gameDiv = document.querySelector(".main-game");
+function getWord(wordIndex, wordsLost, gameTime, lives) {
+    var _a;
+    let livesVar = lives;
+    let wordCheck = true;
+    let wordsLostVar = wordsLost;
+    let wordTime = true;
+    let currentSecond = currentLevel.time;
+    let wordInterval = setInterval(() => {
+        if (currentSecond === 0) {
+            wordTime = false;
+            clearInterval(wordInterval);
+            endGame();
+            return undefined;
+        }
+        currentSecond--;
+    }, 1000);
+    let gameTimeVar = gameTime;
+    let gameInterval = setInterval(() => {
+        gameTimeVar++;
+    }, 100);
+    for (let i = gameDiv.children.length - 1; i >= 0; i--) {
+        gameDiv.children[i].remove();
+    }
+    for (let i = 0; i < currentLevel.wordsArr[wordIndex].length; i++) {
+        let letter = document.createElement("input");
+        letter.setAttribute("data-val", currentLevel.wordsArr[wordIndex][i]);
+        letter.setAttribute("placeholder", currentLevel.wordsArr[wordIndex][i]);
+        gameDiv.appendChild(letter);
+        let letterAfter = currentLevel.wordsArr[wordIndex][i + 1];
+        if (i == 0)
+            (_a = document.querySelector(`input[data-val=${letter.getAttribute("data-val")}]`)) === null || _a === void 0 ? void 0 : _a.focus();
+        letter.addEventListener("input", function () {
+            var _a;
+            if (!(letter.value === ((_a = letter.getAttribute("data-val")) === null || _a === void 0 ? void 0 : _a.toLowerCase()))) {
+                wordCheck = false;
+                livesVar++;
+            }
+            letter.setAttribute("data-val", "");
+            if (!wordTime || livesVar > currentLevel.lives) {
+                clearInterval(wordInterval);
+                clearInterval(gameInterval);
+                endGame();
+                return undefined;
+            }
+            else if (letter === gameDiv.lastElementChild) {
+                if (!wordCheck)
+                    wordsLostVar++;
+                for (let i = 0; i < gameDiv.children.length; i++) {
+                    gameDiv.children[i].remove();
+                }
+                if (wordIndex === currentLevel.wordsArr.length - 1) {
+                    console.log("The End Of The Race");
+                    clearInterval(gameInterval);
+                    console.log(gameTimeVar / 10);
+                    endGame();
+                    return undefined;
+                }
+                clearInterval(wordInterval);
+                return getWord(wordIndex + 1, wordsLostVar, gameTimeVar, livesVar);
+            }
+            let inputAfter = document.querySelector(`input[data-val=${letterAfter}]`);
+            inputAfter === null || inputAfter === void 0 ? void 0 : inputAfter.focus();
+            letter.setAttribute("disabled", "true");
+        });
+    }
+}
+function startGame(wordIndex = 0) {
+    startGameBtn.classList.toggle("active");
+    currentLevel.getLevelWordsArrs(10);
+    let dataInterval = setInterval(() => {
+        if (currentLevel.dataCheck)
+            clearInterval(dataInterval);
+        getWord(wordIndex, 0, 0, 0);
+    }, 1000);
+}
+function endGame() {
+    for (let i = gameDiv.children.length - 1; i >= 0; i--) {
+        gameDiv.children[i].remove();
+    }
+}
+console.log(startGame());
