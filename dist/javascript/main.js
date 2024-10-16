@@ -92,6 +92,7 @@ const startGameBtn = document.querySelector(".start-game");
 const gameDiv = document.querySelector(".main-game");
 function getWord(wordIndex, wordsLost, gameTime, lives) {
     var _a;
+    console.log(currentLevel.wordsArr[wordIndex]);
     let livesVar = lives;
     let wordCheck = true;
     let wordsLostVar = wordsLost;
@@ -141,9 +142,10 @@ function getWord(wordIndex, wordsLost, gameTime, lives) {
                     gameDiv.children[i].remove();
                 }
                 if (wordIndex === currentLevel.wordsArr.length - 1) {
-                    console.log("The End Of The Race");
                     clearInterval(gameInterval);
                     console.log(gameTimeVar / 10);
+                    let wpm = (60 / (gameTimeVar / 10)) * (currentLevel.wordsArr.length - wordsLostVar);
+                    localStorage.setItem("wpm", `${wpm}`);
                     endGame();
                     return undefined;
                 }
