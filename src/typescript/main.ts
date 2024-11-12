@@ -24,6 +24,7 @@ function getWords(letters: number) {
         request.send();
     })
 }
+/*
 
 class GetLevel {
     public name: string;
@@ -65,6 +66,48 @@ class GetLevel {
         }
     }
 }
+*/
+
+class GetLevel {
+    public name: string;
+    public letters: number[];
+    public time: number;
+    public lives: number;
+    protected wordsArrs: string[][] = [];
+    protected randomWordsArr: number = 0;
+    protected randomWordsInArr: number = 0;
+    public wordsArr: string[] = [];
+    public dataCheck: boolean = false;
+
+    constructor(name: string, letters: number[], time: number, lives: number) {
+        this.name = name;
+        this.letters = letters;
+        this.time = time;
+        this.lives = lives;
+    }
+
+    async getLevelWordsArrs(wordsCount: number) {
+        this.dataCheck = false;
+        this.wordsArr = [];
+
+        try {
+            for (let letter of this.letters) {
+                let words = await getWords(letter);
+                this.wordsArrs.push(words as string[]);
+            }
+
+            for (let i = 0; i < wordsCount; i++) {
+                this.randomWordsArr = Math.floor(Math.random() * this.wordsArrs.length);
+                this.randomWordsInArr = Math.floor(Math.random() * this.wordsArrs[this.randomWordsArr].length);
+                this.wordsArr.push(this.wordsArrs[this.randomWordsArr][this.randomWordsInArr]);
+            }
+            this.dataCheck = true;
+        } catch (err) {
+            console.error(`Error: ${err}`);
+        }
+    }
+}
+
 
 let easy = new GetLevel("Easy", [3, 4], 8, 5);
 let medium = new GetLevel("Medium", [4, 5], 6, 3);
@@ -104,16 +147,45 @@ for (let i = 1; i < changeLvlSec.children.length; i++) {
         localStorage.setItem("lvlIndex", (i - 1).toString());
         changeLvlSec.classList.toggle("active");
         lvlName.textContent = currentLevel.name;
+        timeleft.textContent = currentLevel.time.toString();
+        attemps.textContent = currentLevel.lives.toString();
+        endGame();
     })
 }
 
 lvlName.textContent = levels[Number(localStorage.getItem("lvlIndex"))].name;
 
 const startGameBtn = document.querySelector(".start-game") as HTMLButtonElement;
-const gameDiv = document.querySelector(".main-game") as HTMLDivElement;
+const gameDiv = document.querySelector(".main-game .letters") as HTMLDivElement;
+
+startGameBtn.addEventListener("click", function(){
+    startGame();
+});
+
+let wordOne = document.querySelector(".words .wordOne") as HTMLElement;
+let wordTwo = document.querySelector(".words .wordTwo") as HTMLElement;
+
+let timeleft = document.querySelector(".timeleft h2:last-child") as HTMLElement;
+let attemps = document.querySelector(".attemps h2:last-child") as HTMLElement;
+
+timeleft.textContent = currentLevel.time.toString();
+attemps.textContent = currentLevel.lives.toString();
+
+let highScore = document.querySelector(".high-score h2") as HTMLElement;
+if (localStorage.getItem("wpm"))
+    highScore.textContent = Number(localStorage.getItem("wpm")).toFixed(2);
+else {
+    highScore.textContent = "No Score Yet";
+}
+
 
 function getWord(wordIndex: number, wordsLost: number, gameTime: number, lives: number) {
-    console.log(currentLevel.wordsArr[wordIndex]);
+    let currentWord = currentLevel.wordsArr[wordIndex];
+    let wordAfter = currentLevel.wordsArr[wordIndex + 1];
+
+    wordOne.textContent = currentWord;
+    wordTwo.textContent = wordAfter;
+
     let livesVar = lives;
 
     let wordCheck: boolean = true;
@@ -123,11 +195,14 @@ function getWord(wordIndex: number, wordsLost: number, gameTime: number, lives: 
     let currentSecond: number = currentLevel.time;
 
     let wordInterval = setInterval(() => {
+        if (currentSecond > 0) {
+            timeleft.textContent = (Number(timeleft.textContent) - 1).toString();
+        }
         if (currentSecond === 0) {
+            timeleft.textContent = currentLevel.time.toString();
             wordTime = false;
-            clearInterval(wordInterval);
             endGame();
-            return undefined;
+            clearInterval(wordInterval);
         }
         currentSecond--;
     }, 1000)
@@ -143,17 +218,20 @@ function getWord(wordIndex: number, wordsLost: number, gameTime: number, lives: 
     for (let i = 0; i < currentLevel.wordsArr[wordIndex].length; i++) {
         let letter = document.createElement("input");
         letter.setAttribute("data-val", currentLevel.wordsArr[wordIndex][i]);
-        letter.setAttribute("placeholder", currentLevel.wordsArr[wordIndex][i]);
+        letter.setAttribute("placeholder", currentLevel.wordsArr[wordIndex][i].toLowerCase());
         gameDiv.appendChild(letter);
 
         let letterAfter = currentLevel.wordsArr[wordIndex][i + 1];
-        if (i == 0) 
-            document.querySelector<HTMLInputElement>(`input[data-val=${letter.getAttribute("data-val")}]`)?.focus()
+        if (i == 0) {
+            document.querySelector<HTMLInputElement>(`input[data-val=${letter.getAttribute("data-val")}]`)?.focus();
+            letter.classList.add("focused");
+        }
 
         letter.addEventListener("input", function() {
 
             if (!(letter.value === letter.getAttribute("data-val")?.toLowerCase())) {
                 wordCheck = false;
+                attemps.textContent = (Number(attemps.textContent) - 1).toString();
                 livesVar++;
             }
 
@@ -166,7 +244,8 @@ function getWord(wordIndex: number, wordsLost: number, gameTime: number, lives: 
                 return undefined;
             }
 
-            else if (letter === gameDiv.lastElementChild) {
+            if (letter === gameDiv.lastElementChild) {
+                timeleft.textContent = currentLevel.time.toString();
                 if (!wordCheck)
                     wordsLostVar++;
 
@@ -176,9 +255,10 @@ function getWord(wordIndex: number, wordsLost: number, gameTime: number, lives: 
                 
                 if (wordIndex === currentLevel.wordsArr.length - 1) {
                     clearInterval(gameInterval);
-                    console.log(gameTimeVar / 10);
                     let wpm =  (60 / (gameTimeVar / 10)) * (currentLevel.wordsArr.length - wordsLostVar);
                     localStorage.setItem("wpm", `${wpm}`);
+                    timeleft.textContent = currentLevel.time.toString();
+                    highScore.textContent = Number(localStorage.getItem("wpm")).toFixed(2);
                     endGame();
                     return undefined;
                 }
@@ -186,8 +266,10 @@ function getWord(wordIndex: number, wordsLost: number, gameTime: number, lives: 
                 return getWord(wordIndex + 1, wordsLostVar, gameTimeVar, livesVar);
             }
 
+            letter.classList.remove("focused");
             let inputAfter = document.querySelector<HTMLInputElement>(`input[data-val=${letterAfter}]`);
             inputAfter?.focus();
+            inputAfter?.classList.add("focused");
             letter.setAttribute("disabled", "true");
         })
     }
@@ -204,9 +286,12 @@ function startGame(wordIndex: number = 0) {
 }
 
 function endGame() {
+    startGameBtn.classList.add("active");
+    attemps.textContent = currentLevel.lives.toString();
     for (let i = gameDiv.children.length - 1; i >= 0; i--) {
         gameDiv.children[i].remove();
     }
+    timeleft.textContent = currentLevel.time.toString();
+    wordOne.textContent = "";
+    wordTwo.textContent = "";
 }
-
-console.log(startGame());
